@@ -27,9 +27,9 @@ namespace engine
 		}
 		else
 		{
-			std::cerr << "Configuration parsed with errors." << std::endl;
-			std::cerr << "Error description: " << result.description() << std::endl;
-			std::cerr << "Error offset: " << result.offset << std::endl;
+			std::cerr << "Configuration parsed with errors." << '\n';
+			std::cerr << "Error description: " << result.description() << '\n';
+			std::cerr << "Error offset: " << result.offset << '\n';
 		}
 	}
 

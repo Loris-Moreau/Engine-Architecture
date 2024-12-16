@@ -70,9 +70,9 @@ namespace engine
 				}
 				else
 				{
-					std::cerr << "Archetype [" << archetypeName << "] parsed with errors." << std::endl;
-					std::cerr << "Error description: " << result.description() << std::endl;
-					std::cerr << "Error offset: " << result.offset << std::endl;
+					std::cerr << "Archetype [" << archetypeName << "] parsed with errors." << '\n';
+					std::cerr << "Error description: " << result.description() << '\n';
+					std::cerr << "Error offset: " << result.offset << '\n';
 				}
 			}
 		}

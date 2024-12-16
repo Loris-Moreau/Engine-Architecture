@@ -36,7 +36,7 @@ namespace engine
 
 		private:
 			std::set<Entity *> entities;
-			entities::Player *playerEntity{};
+			entities::Player *playerEntity = nullptr;
 
 			// Map
 			std::string currentMapName;

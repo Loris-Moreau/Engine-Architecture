@@ -69,7 +69,7 @@ namespace engine
 				auto collisions = physics::Manager::getInstance().getCollisionsWith(collisionGeomId);
 				for (auto &geomId : collisions)
 				{
-					auto entity = reinterpret_cast<Entity *>(dGeomGetData(geomId));
+					auto entity = static_cast<Entity *>(dGeomGetData(geomId));
 					auto targetEntity = dynamic_cast<entities::Target *>(entity);
 					if (targetEntity)
 					{
@@ -77,7 +77,7 @@ namespace engine
 					}
 				}
 			}
-
+			
 			bool Player::hasJustMoved() const
 			{
 				return justMoved;

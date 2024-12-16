@@ -14,7 +14,7 @@ namespace engine
 			{
 			public:
 				Character();
-				virtual ~Character();
+				virtual ~Character() override;
 
 				virtual void draw() override;
 

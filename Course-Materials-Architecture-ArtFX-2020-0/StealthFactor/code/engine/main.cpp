@@ -36,7 +36,7 @@ int main(int argc, const char **argv)
 	MultiByteToWideChar(CP_ACP, 0, dataPath, -1, wDataPath, 4096);
 	if (!SetCurrentDirectory(wDataPath))
 	{
-		std::cerr << "Unable to set data directory." << std::endl;
+		std::cerr << "Unable to set data directory." << '\n';
 		return EXIT_FAILURE;
 	}
 #endif

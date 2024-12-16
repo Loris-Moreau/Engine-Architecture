@@ -17,8 +17,8 @@ namespace engine
 		static Engine &getInstance();
 
 	private:
-		bool running;
-		float deltaTime;
+		bool running = true;
+		float deltaTime = 1.0f;
 
 		// Configuration
 		std::string startMap;

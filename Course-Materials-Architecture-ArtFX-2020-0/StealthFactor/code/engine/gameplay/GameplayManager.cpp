@@ -43,18 +43,18 @@ namespace engine
 
 		void Manager::gameOver()
 		{
-			std::cout << "Game over" << std::endl;
+			std::cout << "Game over" << '\n';
 			loadMap(currentMapName);
 		}
 
 		sf::Vector2f Manager::getViewCenter() const
 		{
-			return sf::Vector2f{ columns * (CELL_SIZE / 2.f), rows * (CELL_SIZE / 2.f) };
+			return sf::Vector2f{ (float)columns * (CELL_SIZE / 2.f), (float)rows * (CELL_SIZE / 2.f) };
 		}
 
 		void Manager::loadMap(const std::string & mapName)
 		{
-			for (auto entity : entities)
+			for (Entity* entity : entities)
 			{
 				delete entity;
 			}
@@ -90,7 +90,7 @@ namespace engine
 						std::string archetypeName = xmlElement.child_value("archetype");
 
 						auto entity = new entities::Enemy{ archetypeName };
-						entity->setPosition(sf::Vector2f{ (column + 0.5f) * CELL_SIZE, (row + 0.5f) * CELL_SIZE });
+						entity->setPosition(sf::Vector2f{ ((float)column + 0.5f) * CELL_SIZE, ((float)row + 0.5f) * CELL_SIZE });
 
 						entities.insert(entity);
 					}
@@ -104,7 +104,7 @@ namespace engine
 						assert(column >= 0 && column < columns);
 
 						auto entity = new entities::Player{};
-						entity->setPosition(sf::Vector2f{ (column + 0.5f) * CELL_SIZE, (row + 0.5f) * CELL_SIZE });
+						entity->setPosition(sf::Vector2f{ ((float)column + 0.5f) * CELL_SIZE, ((float)row + 0.5f) * CELL_SIZE });
 
 						entities.insert(entity);
 						playerEntity = entity;
@@ -119,7 +119,7 @@ namespace engine
 						assert(column >= 0 && column < columns);
 
 						auto entity = new entities::Target{};
-						entity->setPosition(sf::Vector2f{ (column + 0.5f) * CELL_SIZE, (row + 0.5f) * CELL_SIZE });
+						entity->setPosition(sf::Vector2f{ ((float)column + 0.5f) * CELL_SIZE, ((float)row + 0.5f) * CELL_SIZE });
 
 						entities.insert(entity);
 					}
@@ -134,9 +134,9 @@ namespace engine
 			}
 			else
 			{
-				std::cerr << "Map [" << mapName << "] parsed with errors." << std::endl;
-				std::cerr << "Error description: " << result.description() << std::endl;
-				std::cerr << "Error offset: " << result.offset << std::endl;
+				std::cerr << "Map [" << mapName << "] parsed with errors." << '\n';
+				std::cerr << "Error description: " << result.description() << '\n';
+				std::cerr << "Error offset: " << result.offset << '\n';
 			}
 		}
 
