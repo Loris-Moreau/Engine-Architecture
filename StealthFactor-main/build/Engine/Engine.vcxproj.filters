@@ -1,8 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="gameplay">
       <UniqueIdentifier>{F52FA6BA-E1FC-00C6-0A16-EF6DF6413654}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gameplay\components">
+      <UniqueIdentifier>{0A36726C-7697-4F7A-FF04-962C6B658639}</UniqueIdentifier>
     </Filter>
     <Filter Include="gameplay\entities">
       <UniqueIdentifier>{69A8C3A6-D5BE-C13C-1E36-4D5E8A8B92C4}</UniqueIdentifier>
@@ -19,17 +22,23 @@
     <Filter Include="util">
       <UniqueIdentifier>{43339F7C-2F6A-A00D-D856-8610C46C1C0F}</UniqueIdentifier>
     </Filter>
-    <Filter Include="gameplay\components">
-      <UniqueIdentifier>{c51cca64-85f5-42ba-8500-34543f778196}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\code\engine\Engine.hpp" />
+    <ClInclude Include="..\..\code\engine\gameplay\Component.hpp">
+      <Filter>gameplay</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\code\engine\gameplay\Entity.hpp">
       <Filter>gameplay</Filter>
     </ClInclude>
     <ClInclude Include="..\..\code\engine\gameplay\GameplayManager.hpp">
       <Filter>gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\engine\gameplay\components\DrawComponent.hpp">
+      <Filter>gameplay\components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\engine\gameplay\components\PhysicComponent.hpp">
+      <Filter>gameplay\components</Filter>
     </ClInclude>
     <ClInclude Include="..\..\code\engine\gameplay\entities\Enemy.hpp">
       <Filter>gameplay\entities</Filter>
@@ -46,11 +55,17 @@
     <ClInclude Include="..\..\code\engine\graphics\ShapeList.hpp">
       <Filter>graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\code\engine\graphics\Window.hpp">
+      <Filter>graphics</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\code\engine\input\InputManager.hpp">
       <Filter>input</Filter>
     </ClInclude>
     <ClInclude Include="..\..\code\engine\physics\PhysicsManager.hpp">
       <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\code\engine\util\ComponentManager.hpp">
+      <Filter>util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\code\engine\util\Event.hpp">
       <Filter>util</Filter>
@@ -58,29 +73,23 @@
     <ClInclude Include="..\..\code\engine\util\StringId.hpp">
       <Filter>util</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\code\engine\gameplay\Component.hpp">
-      <Filter>gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\engine\gameplay\components\DrawComponent.hpp">
-      <Filter>gameplay\components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\engine\util\ComponentManager.hpp">
-      <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\engine\gameplay\components\PhysicComponent.hpp">
-      <Filter>gameplay\components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\code\engine\graphics\Window.hpp">
-      <Filter>graphics</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\code\engine\Engine.cpp" />
+    <ClCompile Include="..\..\code\engine\gameplay\Component.cpp">
+      <Filter>gameplay</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\code\engine\gameplay\Entity.cpp">
       <Filter>gameplay</Filter>
     </ClCompile>
     <ClCompile Include="..\..\code\engine\gameplay\GameplayManager.cpp">
       <Filter>gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\engine\gameplay\components\DrawComponent.cpp">
+      <Filter>gameplay\components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\code\engine\gameplay\components\PhysicComponent.cpp">
+      <Filter>gameplay\components</Filter>
     </ClCompile>
     <ClCompile Include="..\..\code\engine\gameplay\entities\Enemy.cpp">
       <Filter>gameplay\entities</Filter>
@@ -97,6 +106,9 @@
     <ClCompile Include="..\..\code\engine\graphics\ShapeList.cpp">
       <Filter>graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\code\engine\graphics\Window.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\code\engine\input\InputManager.cpp">
       <Filter>input</Filter>
     </ClCompile>
@@ -106,18 +118,6 @@
     </ClCompile>
     <ClCompile Include="..\..\code\engine\util\StringId.cpp">
       <Filter>util</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\engine\gameplay\components\DrawComponent.cpp">
-      <Filter>gameplay\components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\engine\gameplay\Component.cpp">
-      <Filter>gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\engine\gameplay\components\PhysicComponent.cpp">
-      <Filter>gameplay\components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\code\engine\graphics\Window.cpp">
-      <Filter>graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
