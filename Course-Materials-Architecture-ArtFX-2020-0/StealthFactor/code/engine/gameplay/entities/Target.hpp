@@ -13,16 +13,9 @@ namespace engine
 			class Target : public Entity
 			{
 			public:
-				Target();
-				~Target() override;
+				Target( engine::Engine& engine );
 
-				virtual void update() override;
-
-				virtual void draw() override;
-
-			private:
-				graphics::ShapeList shapeList;
-				dGeomID collisionGeomId;
+				virtual void update() override {};
 			};
 		}
 	}

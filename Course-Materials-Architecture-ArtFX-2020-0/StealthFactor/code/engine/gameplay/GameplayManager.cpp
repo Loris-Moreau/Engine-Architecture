@@ -16,150 +16,139 @@ namespace engine
 	namespace gameplay
 	{
 		const float Manager::CELL_SIZE = 50.f;
-		Manager *Manager::instance = nullptr;
+
+		Manager::Manager( engine::Engine& engine )
+			: engine( engine )
+		{}
+
+		Manager::~Manager()
+		{
+			entitiesContainer.clear();
+		}
 
 		void Manager::update()
 		{
-			for (auto entity : entities)
+			for ( auto& entity : entitiesContainer )
 			{
 				entity->update();
 			}
 
 			preventMapCompletion = false;
-			if (nextMapRequested && !nextMapName.empty())
+			if ( nextMapRequested && !nextMapName.empty() )
 			{
 				nextMapRequested = false;
-				loadMap(nextMapName);
-			}
-		}
-
-		void Manager::draw()
-		{
-			for (auto entity : entities)
-			{
-				entity->draw();
+				loadMap( nextMapName );
 			}
 		}
 
 		void Manager::gameOver()
 		{
 			std::cout << "Game over" << '\n';
-			loadMap(currentMapName);
+			scheduleLoadMap( currentMapName );
 		}
 
 		sf::Vector2f Manager::getViewCenter() const
 		{
-			return sf::Vector2f{ (float)columns * (CELL_SIZE / 2.f), (float)rows * (CELL_SIZE / 2.f) };
+			return sf::Vector2f { columns * ( CELL_SIZE / 2.f ), rows * ( CELL_SIZE / 2.f ) };
 		}
 
-		void Manager::loadMap(const std::string & mapName)
+		void Manager::loadMap( const std::string& mapName )
 		{
-			for (Entity* entity : entities)
-			{
-				delete entity;
-			}
-			entities.clear();
+			//  clear entities
+			entitiesContainer.clear();
 
-			std::stringstream filename;
-			filename << "maps/" << mapName << ".xml";
-
+			//  read document
+			std::string filename = "maps/" + mapName + ".xml";
 			pugi::xml_document doc;
-			pugi::xml_parse_result result = doc.load_file(filename.str().c_str());
-
-			if (result)
-			{
-				assert(!doc.empty());
-				auto xmlMap = doc.first_child();
-
-				rows = std::stoi(xmlMap.child_value("rows"));
-				assert(rows >= 0);
-
-				columns = std::stoi(xmlMap.child_value("columns"));
-				assert(columns >= 0);
-
-				for (auto &xmlElement : xmlMap.child("elements").children())
-				{
-					if (!std::strcmp(xmlElement.name(), "enemy"))
-					{
-						int row = std::stoi(xmlElement.child_value("row"));
-						assert(row >= 0 && row < rows);
-
-						int column = std::stoi(xmlElement.child_value("column"));
-						assert(column >= 0 && column < columns);
-
-						std::string archetypeName = xmlElement.child_value("archetype");
-
-						auto entity = new entities::Enemy{ archetypeName };
-						entity->setPosition(sf::Vector2f{ ((float)column + 0.5f) * CELL_SIZE, ((float)row + 0.5f) * CELL_SIZE });
-
-						entities.insert(entity);
-					}
-
-					if (!std::strcmp(xmlElement.name(), "player"))
-					{
-						int row = std::stoi(xmlElement.child_value("row"));
-						assert(row >= 0 && row < rows);
-
-						int column = std::stoi(xmlElement.child_value("column"));
-						assert(column >= 0 && column < columns);
-
-						auto entity = new entities::Player{};
-						entity->setPosition(sf::Vector2f{ ((float)column + 0.5f) * CELL_SIZE, ((float)row + 0.5f) * CELL_SIZE });
-
-						entities.insert(entity);
-						playerEntity = entity;
-					}
-
-					if (!std::strcmp(xmlElement.name(), "target"))
-					{
-						int row = std::stoi(xmlElement.child_value("row"));
-						assert(row >= 0 && row < rows);
-
-						int column = std::stoi(xmlElement.child_value("column"));
-						assert(column >= 0 && column < columns);
-
-						auto entity = new entities::Target{};
-						entity->setPosition(sf::Vector2f{ ((float)column + 0.5f) * CELL_SIZE, ((float)row + 0.5f) * CELL_SIZE });
-
-						entities.insert(entity);
-					}
-				}
-
-				currentMapName = mapName;
-				nextMapName = xmlMap.child_value("next_map");
-
-				// JIRA-1337: Map is skipped.
-				// This prevents the map to be completed during the first frame. I don't know why this happens.
-				preventMapCompletion = true;
-			}
-			else
+			pugi::xml_parse_result result = doc.load_file( filename.c_str() );
+			if ( !result )
 			{
 				std::cerr << "Map [" << mapName << "] parsed with errors." << '\n';
 				std::cerr << "Error description: " << result.description() << '\n';
 				std::cerr << "Error offset: " << result.offset << '\n';
+				return;
 			}
+
+			assert( !doc.empty() );
+			auto xmlMap = doc.first_child();
+
+			rows = std::stoi( xmlMap.child_value( "rows" ) );
+			assert( rows >= 0 );
+
+			columns = std::stoi( xmlMap.child_value( "columns" ) );
+			assert( columns >= 0 );
+
+			for ( auto& xmlElement : xmlMap.child( "elements" ).children() )
+			{
+				if ( !std::strcmp( xmlElement.name(), "enemy" ) )
+				{
+					int row = std::stoi( xmlElement.child_value( "row" ) );
+					assert( row >= 0 && row < rows );
+
+					int column = std::stoi( xmlElement.child_value( "column" ) );
+					assert( column >= 0 && column < columns );
+
+					std::string archetypeName = xmlElement.child_value( "archetype" );
+
+					auto entity = std::make_shared<entities::Enemy>( engine, archetypeName );
+					entity->setPosition( sf::Vector2f { ( column + 0.5f ) * CELL_SIZE, ( row + 0.5f ) * CELL_SIZE } );
+
+					entitiesContainer.insert( entity );
+				}
+
+				if ( !std::strcmp( xmlElement.name(), "player" ) )
+				{
+					int row = std::stoi( xmlElement.child_value( "row" ) );
+					assert( row >= 0 && row < rows );
+
+					int column = std::stoi( xmlElement.child_value( "column" ) );
+					assert( column >= 0 && column < columns );
+
+					auto entity = std::make_shared<entities::Player>( engine );
+					entity->setPosition( sf::Vector2f { ( column + 0.5f ) * CELL_SIZE, ( row + 0.5f ) * CELL_SIZE } );
+
+					entitiesContainer.insert( entity );
+					playerEntity = entity;
+				}
+
+				if ( !std::strcmp( xmlElement.name(), "target" ) )
+				{
+					int row = std::stoi( xmlElement.child_value( "row" ) );
+					assert( row >= 0 && row < rows );
+
+					int column = std::stoi( xmlElement.child_value( "column" ) );
+					assert( column >= 0 && column < columns );
+
+					auto entity = std::make_shared<entities::Target>( engine );
+					entity->setPosition( sf::Vector2f { ( column + 0.5f ) * CELL_SIZE, ( row + 0.5f ) * CELL_SIZE } );
+
+					entitiesContainer.insert( entity );
+				}
+			}
+
+			currentMapName = mapName;
+			nextMapName = xmlMap.child_value( "next_map" );
+
+			//  set camera view
+			engine.getGraphicsManager().setViewPosition( getViewCenter() );
+
+			// JIRA-1337: Map is skipped.
+			// This prevents the map to be completed during the first frame. I don't know why this happens.
+			preventMapCompletion = true;
 		}
 
-		void Manager::loadNextMap()
+		void Manager::scheduleLoadMap( const std::string& map_name )
 		{
-			if (!preventMapCompletion)
+			if ( !preventMapCompletion )
 			{
 				nextMapRequested = true;
+				nextMapName = map_name;
 			}
 		}
 
-		const entities::Player &Manager::getPlayer() const
+		void Manager::scheduleLoadNextMap()
 		{
-			assert(playerEntity);
-			return *playerEntity;
-		}
-
-		Manager &Manager::getInstance()
-		{
-			if (!instance)
-				instance = new Manager();
-
-			return *instance;
+			scheduleLoadMap( nextMapName );
 		}
 	}
 }

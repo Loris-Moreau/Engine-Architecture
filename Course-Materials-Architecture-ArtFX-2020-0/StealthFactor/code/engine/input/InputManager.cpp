@@ -1,36 +1,33 @@
 #include "engine/input/InputManager.hpp"
 
 #include <iterator>
-#include <engine/graphics/GraphicsManager.hpp>
 
 namespace engine
 {
 	namespace input
 	{
-		Manager *Manager::instance = nullptr;
+		Manager::Manager( engine::graphics::Window& _window )
+			: window( _window )
+		{}
 
-		bool Manager::isKeyPressed(sf::Keyboard::Key key) const
+		void Manager::init()
 		{
-			if (!graphics::Manager::getInstance().hasFocus())
-				return false;
-
-			return sf::Keyboard::isKeyPressed(key);
-		}
-
-		bool Manager::isKeyJustPressed(sf::Keyboard::Key key) const
-		{
-			if (!graphics::Manager::getInstance().hasFocus())
-				return false;
-
-			return justPressedKeys.find(key) != std::end(justPressedKeys);
-		}
-
-		bool Manager::isKeyJustReleased(sf::Keyboard::Key key) const
-		{
-			if (!graphics::Manager::getInstance().hasFocus())
-				return false;
-
-			return justReleasedKeys.find(key) != std::end(justReleasedKeys);
+			//  bind focus
+			window.OnFocus.listen( "input::Manager",
+				[&]( bool has_focus ) {
+				hasFocus = has_focus;
+				printf( "Has Focus %d\n", has_focus );
+			}
+			);
+			hasFocus = window.hasFocus();
+		
+			//  bind keys
+			window.OnKeyPressed.listen( "input::Manager",
+				std::bind( &Manager::onKeyPressed, this, std::placeholders::_1 ) 
+			);
+			window.OnKeyReleased.listen( "input::Manager",
+				std::bind( &Manager::onKeyReleased, this, std::placeholders::_1 )
+			);
 		}
 
 		void Manager::clear()
@@ -39,22 +36,32 @@ namespace engine
 			justReleasedKeys.clear();
 		}
 
-		void Manager::onKeyPressed(const sf::Event::KeyEvent &event)
+		bool Manager::isKeyPressed( sf::Keyboard::Key key ) const
 		{
-			justPressedKeys.insert(event.code);
+			if ( !hasFocus ) return false;
+			return sf::Keyboard::isKeyPressed( key );
 		}
 
-		void Manager::onKeyReleased(const sf::Event::KeyEvent &event)
+		bool Manager::isKeyJustPressed( sf::Keyboard::Key key ) const
 		{
-			justReleasedKeys.insert(event.code);
+			if ( !hasFocus ) return false;
+			return justPressedKeys.find( key ) != std::end( justPressedKeys );
 		}
 
-		Manager &Manager::getInstance()
+		bool Manager::isKeyJustReleased( sf::Keyboard::Key key ) const
 		{
-			if (!instance)
-				instance = new Manager();
+			if ( !hasFocus ) return false;
+			return justReleasedKeys.find( key ) != std::end( justReleasedKeys );
+		}
 
-			return *instance;
+		void Manager::onKeyPressed( const sf::Event::KeyEvent& event )
+		{
+			justPressedKeys.insert( event.code );
+		}
+
+		void Manager::onKeyReleased( const sf::Event::KeyEvent& event )
+		{
+			justReleasedKeys.insert( event.code );
 		}
 	}
 }

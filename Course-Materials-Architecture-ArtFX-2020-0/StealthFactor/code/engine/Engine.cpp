@@ -12,7 +12,13 @@
 
 namespace engine
 {
-	Engine *Engine::instance = nullptr;
+	Engine::Engine() 
+	{
+		gameplayManager = std::make_unique<gameplay::Manager>( *this );
+		graphicsManager = std::make_unique<graphics::Manager>( *this );
+		physicsManager = std::make_unique<physics::Manager>();
+		inputManager = std::make_unique<input::Manager>( graphicsManager->getWindow() );
+	}
 
 	void Engine::loadConfiguration()
 	{
@@ -37,40 +43,42 @@ namespace engine
 	{
 		running = true;
 
-		gameplay::Manager::getInstance().loadMap(startMap);
+		//  init
+		inputManager->init();
+		gameplayManager->loadMap(startMap);
 
+		//  bind window close
+		graphicsManager->getWindow().OnWindowClose.listen("engine",
+			std::bind( &Engine::exit, this )
+		);
+
+		//  game-loop
 		sf::Clock clock;
 		while (running)
 		{
 			deltaTime = clock.restart().asSeconds();
 
-			physics::Manager::getInstance().update();
-			gameplay::Manager::getInstance().update();
-			graphics::Manager::getInstance().update();
+			//  update
+			inputManager->clear();
+			graphicsManager->update();
+			gameplayManager->update();
+			physicsManager->update();
 
-			graphics::Manager::getInstance().clear();
-
-			gameplay::Manager::getInstance().draw();
-
-			graphics::Manager::getInstance().display();
+			//  draw
+			graphicsManager->draw();
 		}
-	}
 
-	float Engine::getDeltaTime() const
-	{
-		return deltaTime;
+		//  release managers
+		gameplayManager.reset( nullptr );
+		graphicsManager.reset( nullptr );
+		physicsManager.reset( nullptr );
+		inputManager.reset( nullptr );
 	}
 
 	void Engine::exit()
 	{
+		//  close window and exit run loop
+		graphicsManager->close();
 		running = false;
-	}
-
-	Engine &Engine::getInstance()
-	{
-		if (!instance)
-			instance = new Engine();
-
-		return *instance;
 	}
 }

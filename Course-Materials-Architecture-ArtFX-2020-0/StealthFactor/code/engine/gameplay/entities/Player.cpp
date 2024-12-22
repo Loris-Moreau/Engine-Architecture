@@ -9,6 +9,8 @@
 #include <engine/input/InputManager.hpp>
 #include <engine/physics/PhysicsManager.hpp>
 #include <engine/Engine.hpp>
+#include "engine/gameplay/components/DrawComponent.hpp"
+#include "engine/gameplay/components/PhysicComponent.hpp"
 
 namespace engine
 {
@@ -16,12 +18,21 @@ namespace engine
 	{
 		namespace entities
 		{
-			Player::Player()
+			Player::Player( engine::Engine& engine )
+				: Entity( engine )
 			{
-				shapeList.load("player");
+				//  setup physics
+				physicsComponent = createComponent<components::PhysicComponent>(
+					engine.getPhysicsManager(),
+					gameplay::Manager::CELL_SIZE * 0.9f, 
+					gameplay::Manager::CELL_SIZE * 0.9f
+				);
 
-				collisionGeomId = dCreateBox(physics::Manager::getInstance().getSpaceId(), gameplay::Manager::CELL_SIZE * 0.9f, gameplay::Manager::CELL_SIZE * 0.9f, 1.f);
-				dGeomSetData(collisionGeomId, this);
+				//  setup rendering
+				createComponent<components::DrawComponent>(
+					engine.getGraphicsManager(),
+					"player"
+				);
 			}
 
 			void Player::update()
@@ -30,57 +41,51 @@ namespace engine
 				auto position = getPosition();
 				float rotation = getRotation();
 
-				if (input::Manager::getInstance().isKeyJustPressed(sf::Keyboard::Left))
+				//  listen inputs
+				auto& input_manager = engine.getInputManager();
+				if ( input_manager.isKeyJustPressed( sf::Keyboard::Left ) )
 				{
 					justMoved = true;
 					position.x -= gameplay::Manager::CELL_SIZE;
 					rotation = 180.f;
 				}
-
-				if (input::Manager::getInstance().isKeyJustPressed(sf::Keyboard::Right))
+				if ( input_manager.isKeyJustPressed( sf::Keyboard::Right ) )
 				{
 					justMoved = true;
 					position.x += gameplay::Manager::CELL_SIZE;
 					rotation = 0.f;
 				}
-
-				if (input::Manager::getInstance().isKeyJustPressed(sf::Keyboard::Up))
+				if ( input_manager.isKeyJustPressed( sf::Keyboard::Up ) )
 				{
 					justMoved = true;
 					position.y -= gameplay::Manager::CELL_SIZE;
 					rotation = -90.f;
 				}
-
-				if (input::Manager::getInstance().isKeyJustPressed(sf::Keyboard::Down))
+				if ( input_manager.isKeyJustPressed( sf::Keyboard::Down ) )
 				{
 					justMoved = true;
 					position.y += gameplay::Manager::CELL_SIZE;
 					rotation = 90.f;
 				}
 
-				if (justMoved)
+				//  update transform
+				if ( justMoved )
 				{
-					setPosition(position);
-					setRotation(rotation);
-
-					dGeomSetPosition(collisionGeomId, position.x, position.y, 0);
+					setPosition( position );
+					setRotation( rotation );
 				}
 
-				auto collisions = physics::Manager::getInstance().getCollisionsWith(collisionGeomId);
-				for (auto &geomId : collisions)
+				//  check collisions w/ a Target
+				auto collisions = physicsComponent->getCollisions();
+				for ( auto& component : collisions )
 				{
-					auto entity = static_cast<Entity *>(dGeomGetData(geomId));
-					auto targetEntity = dynamic_cast<entities::Target *>(entity);
-					if (targetEntity)
+					auto entity = &component->getOwner();
+					auto targetEntity = dynamic_cast<entities::Target*>( entity );
+					if ( targetEntity )
 					{
-						gameplay::Manager::getInstance().loadNextMap();
+						engine.getGameplayManager().scheduleLoadNextMap();
 					}
 				}
-			}
-			
-			bool Player::hasJustMoved() const
-			{
-				return justMoved;
 			}
 		}
 	}

@@ -4,6 +4,19 @@ namespace engine
 {
 	namespace gameplay
 	{
+		Entity::Entity( engine::Engine& engine )
+			: engine( engine ) 
+		{}
+
+		Entity::~Entity()
+		{
+			for ( auto& component : components )
+			{
+				component->unsetup();
+			}
+			components.clear();
+		}
+
 		const sf::Vector2f & Entity::getPosition() const
 		{
 			return _position;

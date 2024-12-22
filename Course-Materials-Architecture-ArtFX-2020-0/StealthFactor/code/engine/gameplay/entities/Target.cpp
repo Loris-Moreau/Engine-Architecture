@@ -3,6 +3,10 @@
 #include <engine/gameplay/GameplayManager.hpp>
 #include <engine/graphics/GraphicsManager.hpp>
 #include <engine/physics/PhysicsManager.hpp>
+#include "engine/gameplay/components/DrawComponent.hpp"
+#include "engine/gameplay/components/PhysicComponent.hpp"
+
+#include "engine/Engine.hpp"
 
 namespace engine
 {
@@ -10,28 +14,21 @@ namespace engine
 	{
 		namespace entities
 		{
-			Target::Target()
+			Target::Target( engine::Engine& engine )
+				: Entity( engine )
 			{
-				shapeList.load("target");
+				//  setup physics
+				createComponent<components::PhysicComponent>(
+					engine.getPhysicsManager(),
+					gameplay::Manager::CELL_SIZE * 0.9f,
+					gameplay::Manager::CELL_SIZE * 0.9f
+				);
 
-				collisionGeomId = dCreateBox(physics::Manager::getInstance().getSpaceId(), gameplay::Manager::CELL_SIZE * 0.9f, gameplay::Manager::CELL_SIZE * 0.9f, 1.f);
-				dGeomSetData(collisionGeomId, this);
-			}
-
-			Target::~Target()
-			{
-				dGeomDestroy(collisionGeomId);
-			}
-
-			void Target::update()
-			{
-				auto &position = getPosition();
-				dGeomSetPosition(collisionGeomId, position.x, position.y, 0);
-			}
-
-			void Target::draw()
-			{
-				graphics::Manager::getInstance().draw(shapeList, getTransform());
+				//  setup rendering
+				createComponent<components::DrawComponent>(
+					engine.getGraphicsManager(),
+					"target"
+				);
 			}
 		}
 	}

@@ -1,36 +1,46 @@
 #pragma once
 
-#include <SFML/Graphics/RenderWindow.hpp>
+#include "engine/util/Event.hpp"
+#include "engine/gameplay/components/DrawComponent.hpp"
+#include "Window.hpp"
+
+#include "engine/util/ComponentManager.hpp"
 
 namespace engine
 {
+	class Engine;
+
 	namespace graphics
 	{
 		class ShapeList;
+		class Window;
 
-		class Manager
+		class Manager : public util::ComponentManager<engine::gameplay::components::DrawComponent>
 		{
 		public:
-			Manager();
-			~Manager();
+			Manager( engine::Engine& engine );
 
 			void update();
+			void draw();
+			void close();
 
-			void clear();
-			void draw(const ShapeList &shapeList, const sf::Transform &transform);
-			void display();
+			void setViewPosition( const sf::Vector2f& pos );
+
+			void drawShape(const ShapeList &shapeList, const sf::Transform &transform);
 
 			bool hasFocus() const;
 
-			static Manager &getInstance();
+			Window& getWindow() { return window; }
 
 		private:
-			sf::RenderWindow window;
+			void clear();
+
+			Window window;
 
 			static const sf::Int16 WINDOW_WIDTH = 800;
 			static const sf::Int16 WINDOW_HEIGHT = 600;
 
-			static Manager *instance;
+			engine::Engine& engine;
 		};
 	}
 }

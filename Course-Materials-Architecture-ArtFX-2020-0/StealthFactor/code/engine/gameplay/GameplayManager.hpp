@@ -2,10 +2,14 @@
 
 #include <set>
 #include <string>
+#include <memory>
+
 #include <SFML/System/Vector2.hpp>
 
 namespace engine
 {
+	class Engine;
+
 	namespace gameplay
 	{
 		class Entity;
@@ -18,25 +22,25 @@ namespace engine
 		class Manager
 		{
 		public:
+			Manager( engine::Engine& engine );
+			virtual ~Manager();
+
 			void update();
-			void draw();
 
 			void gameOver();
 
+			void loadMap(const std::string& map_name);
+			void scheduleLoadMap( const std::string& map_name );
+			void scheduleLoadNextMap();
+
 			sf::Vector2f getViewCenter() const;
-
-			void loadMap(const std::string &mapName);
-			void loadNextMap();
-
-			const entities::Player &getPlayer() const;
+			std::weak_ptr<entities::Player> getPlayer() const { return playerEntity; }
 
 			static const float CELL_SIZE;
 
-			static Manager &getInstance();
-
 		private:
-			std::set<Entity *> entities;
-			entities::Player *playerEntity = nullptr;
+			std::set<std::shared_ptr<Entity>> entitiesContainer;
+			std::weak_ptr<entities::Player> playerEntity;
 
 			// Map
 			std::string currentMapName;
@@ -47,7 +51,7 @@ namespace engine
 			bool preventMapCompletion{ false };
 			bool nextMapRequested{ false };
 
-			static Manager *instance;
+			engine::Engine& engine;
 		};
 	}
 }
